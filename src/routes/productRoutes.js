@@ -6,26 +6,41 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     const category = req.query.category;
+
     const cursorUpdatedAt = req.query.cursorUpdatedAt;
     const cursorId = req.query.cursorId;
 
-    let where = category ? { category } : {};
+    const snapshotTime =
+      req.query.snapshotTime || new Date().toISOString();
 
-    // Cursor pagination
+    let where = {
+      updatedAt: {
+        lte: new Date(snapshotTime)
+      }
+    };
+
+    if (category) {
+      where.category = category;
+    }
+
     if (cursorUpdatedAt && cursorId) {
       where = {
         ...where,
-        OR: [
+        AND: [
           {
-            updatedAt: {
-              lt: new Date(cursorUpdatedAt)
-            }
-          },
-          {
-            updatedAt: new Date(cursorUpdatedAt),
-            id: {
-              lt: cursorId
-            }
+            OR: [
+              {
+                updatedAt: {
+                  lt: new Date(cursorUpdatedAt)
+                }
+              },
+              {
+                updatedAt: new Date(cursorUpdatedAt),
+                id: {
+                  lt: cursorId
+                }
+              }
+            ]
           }
         ]
       };
@@ -51,11 +66,13 @@ router.get("/", async (req, res) => {
 
     res.json({
       items: products,
-      nextCursor
+      nextCursor,
+      snapshotTime
     });
 
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Something went wrong"
     });
@@ -75,6 +92,7 @@ router.get("/categories", async (req, res) => {
 
   } catch (error) {
     console.error(error);
+
     res.status(500).json({
       error: "Something went wrong"
     });
