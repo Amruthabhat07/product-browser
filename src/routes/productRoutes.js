@@ -2,10 +2,15 @@ const express = require("express");
 const prisma = require("../lib/prisma");
 
 const router = express.Router();
-const limit = parseInt(req.query.limit) || 20;
 
 router.get("/", async (req, res) => {
   try {
+
+    const limit = Math.min(
+      parseInt(req.query.limit) || 20,
+      100
+    );
+
     const category = req.query.category;
 
     const cursorUpdatedAt = req.query.cursorUpdatedAt;
