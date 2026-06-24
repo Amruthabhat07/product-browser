@@ -289,9 +289,11 @@ Hosted on Render.
 
 Deployment URL:
 
-```text
-PASTE_RENDER_URL_HERE
-```
+Live API:
+https://product-browser-l4gj.onrender.com
+
+GitHub:
+https://github.com/Amruthabhat07/product-browser
 
 ### Database
 
