@@ -2,6 +2,7 @@ const express = require("express");
 const prisma = require("../lib/prisma");
 
 const router = express.Router();
+const limit = parseInt(req.query.limit) || 20;
 
 router.get("/", async (req, res) => {
   try {
@@ -12,6 +13,18 @@ router.get("/", async (req, res) => {
 
     const snapshotTime =
       req.query.snapshotTime || new Date().toISOString();
+
+if (cursorUpdatedAt && isNaN(Date.parse(cursorUpdatedAt))) {
+  return res.status(400).json({
+    error: "Invalid cursorUpdatedAt"
+  });
+}
+
+if (snapshotTime && isNaN(Date.parse(snapshotTime))) {
+  return res.status(400).json({
+    error: "Invalid snapshotTime"
+  });
+}
 
     let where = {
       updatedAt: {
@@ -48,7 +61,7 @@ router.get("/", async (req, res) => {
 
     const products = await prisma.product.findMany({
       where,
-      take: 20,
+      take: limit,
       orderBy: [
         { updatedAt: "desc" },
         { id: "desc" }
