@@ -6,13 +6,27 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/products", productRoutes);
+// Root endpoint
+app.get("/", (req, res) => {
+  res.json({
+    message: "Product Browser API is running",
+    endpoints: [
+      "/health",
+      "/products",
+      "/products/categories"
+    ]
+  });
+});
 
+// Health check
 app.get("/health", (req, res) => {
   res.json({
     status: "ok"
   });
 });
+
+// Product routes
+app.use("/products", productRoutes);
 
 const PORT = process.env.PORT || 3000;
 
